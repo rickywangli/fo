@@ -95,28 +95,6 @@ html, body {
 .streak-circle .number { font-size: 1.8rem; font-weight: 700; color: var(--primary); line-height: 1; }
 .streak-circle .label { font-size: 0.7rem; color: var(--text-secondary); margin-top: 2px; }
 
-/* 日历 */
-.calendar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-.calendar-header button {
-  background: none; border: none; font-size: 1.2rem; cursor: pointer;
-  padding: 4px 10px; border-radius: 8px; color: var(--primary);
-}
-.calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
-.calendar-day-header { text-align: center; font-size: 0.8rem; color: var(--text-secondary); padding: 6px 0; font-weight: 500; }
-.calendar-day {
-  text-align: center; padding: 8px 4px; border-radius: 10px;
-  font-size: 0.9rem; cursor: default; position: relative;
-  min-height: 36px; display: flex; flex-direction: column; align-items: center; justify-content: center;
-}
-.calendar-day .lunar-num { font-size: 0.6rem; color: var(--text-secondary); line-height: 1; margin-top: 1px; }
-.calendar-day.today { background: var(--primary); color: #fff; font-weight: 700; }
-.calendar-day.today .lunar-num { color: rgba(255,255,255,0.8); }
-.calendar-day.ten-precept { color: var(--red); font-weight: 700; }
-.calendar-day.ten-precept::after {
-  content: '斋'; font-size: 0.55rem; line-height: 1; color: var(--red); font-weight: 700;
-}
-.calendar-day.other-month { color: var(--text-secondary); opacity: 0.4; }
-
 /* 经文列表 */
 .sutra-list { list-style: none; }
 .sutra-item { display: flex; align-items: center; padding: 14px 0; border-bottom: 1px solid var(--border); }
@@ -182,8 +160,6 @@ html, body {
   .card { padding: 14px !important; border-radius: 12px !important; margin-bottom: 12px !important; }
   .card h3 { font-size: 1.05rem !important; }
   .reading-content { font-size: 17px !important; line-height: 2.2 !important; }
-  .calendar-grid { gap: 4px !important; }
-  .calendar-day { font-size: 0.8rem !important; padding: 6px 2px !important; border-radius: 8px !important; min-height: 32px !important; }
   .btn { padding: 10px 16px !important; font-size: 0.9rem !important; }
   .streak-circle { width: 90px !important; height: 90px !important; }
   .sutra-item { padding: 12px 0 !important; }
@@ -224,21 +200,6 @@ html, body {
             <button class="btn btn-primary" id="checkInBtn" style="margin-top:10px;padding:8px 18px;font-size:0.85rem;">今日打卡 ✓</button>
           </div>
         </div>
-      </div>
-      <div class="card">
-        <h3>📅 十斋日</h3>
-        <div class="calendar-header">
-          <button id="prevMonth">◀</button>
-          <span id="calendarTitle" style="font-weight:600;font-size:1rem;"></span>
-          <button id="nextMonth">▶</button>
-        </div>
-        <div class="calendar-grid" id="calendarWeekdays">
-          <div class="calendar-day-header">日</div><div class="calendar-day-header">一</div><div class="calendar-day-header">二</div>
-          <div class="calendar-day-header">三</div><div class="calendar-day-header">四</div><div class="calendar-day-header">五</div><div class="calendar-day-header">六</div>
-        </div>
-        <div class="calendar-grid" id="calendarDays"></div>
-        <p style="font-size:0.75rem;color:var(--text-secondary);margin-top:10px;">十斋日：农历初一、初八、十四、十五、十八、廿三、廿四、廿八、廿九、三十 <span style="color:var(--red);">●</span></p>
-        <p style="font-size:0.7rem;color:var(--text-secondary);margin-top:4px;">《地藏经》：能于是十斋日，对佛菩萨诸贤圣像前读是经一遍，东西南北百由旬内，无诸灾难。</p>
       </div>
     </div>
 
@@ -338,85 +299,6 @@ html, body {
 <script src="sutra.js"></script>
 
 <script>
-// ===== 内嵌农历计算（简化版，基于已知参考点） =====
-// 参考点：2024-02-10 是农历甲辰年正月初一
-// 每个农历月天数（2024-2030），1=30天 0=29天
-// 格式：年 -> [月天数数组，索引0=正月]
-const LUNAR_MONTH_DAYS = {
-  2024: [1,0,1,0,1,1,0,1,1,0,1,1], // 正月30 二月29 三月30...
-  2025: [1,1,0,1,1,0,1,1,1,0,1,1], // 甲辰/乙巳年
-  2026: [0,1,1,0,1,1,0,1,1,0,1,1],
-  2027: [1,0,1,1,1,0,1,0,1,1,0,1],
-  2028: [1,1,0,1,1,0,1,1,0,1,1,0],
-  2029: [1,1,0,1,1,1,0,1,1,0,1,1],
-  2030: [0,1,1,0,1,1,0,1,1,0,1,1],
-};
-
-// 十斋日：农历日期
-const TEN_PRECEPT_DAYS = [1, 8, 14, 15, 18, 23, 24, 28, 29, 30];
-
-// 获取某公历日期对应的农历日（返回 {month, day, isLeap}）
-function getLunarDate(solarDate) {
-  const refDate = new Date(2024, 1, 10); // 2024-02-10 正月初一
-  const target = new Date(solarDate.getFullYear(), solarDate.getMonth(), solarDate.getDate());
-  const diffDays = Math.floor((target - refDate) / (24 * 60 * 60 * 1000));
-  
-  // 从参考点往前/后推算
-  let totalDays = diffDays;
-  let year = 2024;
-  let lunarMonth = 1;
-  let lunarDay = 1;
-  
-  if (totalDays >= 0) {
-    // 往后推
-    let remaining = totalDays;
-    while (remaining > 0) {
-      const yDays = LUNAR_MONTH_DAYS[year] || LUNAR_MONTH_DAYS[2024];
-      let m = lunarMonth - 1;
-      let daysInMonth = yDays[m] ? 30 : 29;
-      
-      if (remaining >= daysInMonth) {
-        remaining -= daysInMonth;
-        lunarMonth++;
-        if (lunarMonth > 12) { lunarMonth = 1; year++; }
-        lunarDay = 1;
-      } else {
-        lunarDay += remaining;
-        remaining = 0;
-      }
-    }
-  } else {
-    // 往前推
-    let remaining = -totalDays;
-    year = 2024; lunarMonth = 1; lunarDay = 1;
-    // 先退到参考点
-    while (remaining > 0) {
-      lunarDay--;
-      if (lunarDay < 1) {
-        lunarMonth--;
-        if (lunarMonth < 1) { lunarMonth = 12; year--; }
-        const yDays = LUNAR_MONTH_DAYS[year] || LUNAR_MONTH_DAYS[2024];
-        daysInMonth = yDays[lunarMonth - 1] ? 30 : 29;
-        lunarDay = daysInMonth;
-      }
-      remaining--;
-    }
-  }
-  
-  return { year, month: lunarMonth, day: lunarDay };
-}
-
-// 判断某公历日期是否为十斋日
-function isTenPreceptDay(solarDate) {
-  const lunar = getLunarDate(solarDate);
-  return TEN_PRECEPT_DAYS.includes(lunar.day);
-}
-
-// 获取农历日数字（用于显示）
-function getLunarDayNum(solarDate) {
-  return getLunarDate(solarDate).day;
-}
-
 // ===== 数据层 =====
 const STORE_KEY = 'buddha_app_data_v1';
 
@@ -484,53 +366,6 @@ function updateHome() {
   }
   document.getElementById('streakDays').textContent = streak;
 }
-
-// ===== 日历（带农历+十斋日） =====
-let calYear, calMonth;
-function renderCalendar() {
-  const now = new Date();
-  if (calYear === undefined) { calYear = now.getFullYear(); calMonth = now.getMonth(); }
-  document.getElementById('calendarTitle').textContent = `${calYear}年${calMonth + 1}月`;
-  const grid = document.getElementById('calendarDays'); grid.innerHTML = '';
-  const firstDay = new Date(calYear, calMonth, 1).getDay();
-  const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
-  const today = new Date();
-  const isToday = (y, m, d) => y === today.getFullYear() && m === today.getMonth() && d === today.getDate();
-  const prevDays = new Date(calYear, calMonth, 0).getDate();
-  
-  // 上月尾部
-  for (let i = firstDay - 1; i >= 0; i--) {
-    const el = document.createElement('div'); el.className = 'calendar-day other-month';
-    const pd = prevDays - i;
-    el.innerHTML = `<span>${pd}</span>`;
-    grid.appendChild(el);
-  }
-  
-  // 当月
-  for (let d = 1; d <= daysInMonth; d++) {
-    const el = document.createElement('div'); el.className = 'calendar-day';
-    const solarDate = new Date(calYear, calMonth, d);
-    const lunarDay = getLunarDayNum(solarDate);
-    
-    el.innerHTML = `<span>${d}</span><span class="lunar-num">${lunarDay}</span>`;
-    
-    if (isToday(calYear, calMonth, d)) el.classList.add('today');
-    if (isTenPreceptDay(solarDate)) el.classList.add('ten-precept');
-    
-    grid.appendChild(el);
-  }
-  
-  // 下月头部
-  const totalCells = firstDay + daysInMonth;
-  const nextDays = totalCells % 7 === 0 ? 0 : 7 - (totalCells % 7);
-  for (let i = 1; i <= nextDays; i++) {
-    const el = document.createElement('div'); el.className = 'calendar-day other-month';
-    el.innerHTML = `<span>${i}</span>`;
-    grid.appendChild(el);
-  }
-}
-document.getElementById('prevMonth').addEventListener('click', () => { calMonth--; if (calMonth < 0) { calMonth = 11; calYear--; } renderCalendar(); });
-document.getElementById('nextMonth').addEventListener('click', () => { calMonth++; if (calMonth > 11) { calMonth = 0; calYear++; } renderCalendar(); });
 
 // ===== 仪轨 =====
 document.getElementById('ritualDone').addEventListener('click', () => {
@@ -645,7 +480,7 @@ document.getElementById('importFile').addEventListener('change', (e) => {
 
 // ===== 初始化 =====
 function init() {
-  updateHome(); renderCalendar(); renderSutraList();
+  updateHome(); renderSutraList();
   if (appData.ritualDone) { const btn = document.getElementById('ritualDone'); btn.textContent = '已完成 ✓'; btn.disabled = true; }
 }
 init();
