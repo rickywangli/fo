@@ -27,40 +27,52 @@ html, body {
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
 }
-.app-container { display: flex; min-height: 100vh; }
+body { padding-bottom: 80px; }
 
-/* 侧边栏 */
-.sidebar {
-  width: 220px;
+/* 顶部标题栏 */
+.top-bar {
   background: var(--card-bg);
-  border-right: 1px solid var(--border);
-  padding: 20px 15px;
+  border-bottom: 1px solid var(--border);
+  padding: 14px 20px 10px;
+  text-align: center;
+  position: sticky;
+  top: 0;
+  z-index: 99;
+}
+.top-bar h2 { font-size: 1rem; color: var(--primary); }
+.top-bar .subtitle { font-size: 0.7rem; color: var(--text-secondary); margin-top: 2px; }
+
+/* 底部导航 */
+.bottom-nav {
   position: fixed;
-  top: 0; left: 0;
-  height: 100vh;
-  overflow-y: auto;
+  bottom: 0; left: 0; right: 0;
+  background: var(--card-bg);
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: 8px 4px calc(8px + env(safe-area-inset-bottom));
   z-index: 100;
-  transition: all 0.3s;
 }
-.sidebar h2 { font-size: 1.1rem; color: var(--primary); margin-bottom: 4px; text-align: center; }
-.sidebar .subtitle { font-size: 0.75rem; color: var(--text-secondary); text-align: center; margin-bottom: 20px; }
 .nav-item {
-  display: flex; align-items: center;
-  padding: 12px 14px; margin-bottom: 6px;
-  border-radius: 12px; cursor: pointer;
-  transition: all 0.2s; font-size: 0.95rem; color: var(--text);
+  display: flex; flex-direction: column; align-items: center;
+  padding: 6px 10px;
+  border-radius: 10px; cursor: pointer;
+  transition: all 0.2s;
   user-select: none;
+  min-width: 56px;
 }
-.nav-item:hover { background: rgba(139,105,20,0.08); }
-.nav-item.active { background: var(--primary); color: #fff; }
-.nav-item .icon { margin-right: 10px; font-size: 1.1rem; flex-shrink: 0; }
+.nav-item .icon { font-size: 1.25rem; margin-bottom: 2px; }
+.nav-item span:not(.icon) { font-size: 0.65rem; color: var(--text-secondary); font-weight: 500; }
+.nav-item.active { background: rgba(139,105,20,0.1); }
+.nav-item.active span:not(.icon) { color: var(--primary); font-weight: 600; }
+.nav-item.active .icon { transform: scale(1.1); }
 
 /* 主内容 */
 .main-content {
-  margin-left: 220px;
-  padding: 24px;
-  flex: 1;
-  max-width: calc(100vw - 220px);
+  padding: 16px;
+  max-width: 800px;
+  margin: 0 auto;
 }
 
 /* 卡片 */
@@ -136,7 +148,7 @@ html, body {
 
 /* Toast */
 .toast {
-  position: fixed; bottom: 30px; left: 50%;
+  position: fixed; bottom: 90px; left: 50%;
   transform: translateX(-50%) translateY(100px);
   background: rgba(0,0,0,0.8); color: #fff;
   padding: 12px 24px; border-radius: 25px;
@@ -149,150 +161,141 @@ html, body {
 .page { display: none; }
 .page.active { display: block; }
 
-/* ===== 手机端 ===== */
-@media (max-width: 768px) {
-  .sidebar { width: 60px !important; padding: 15px 5px !important; overflow-y: auto; overflow-x: hidden; }
-  .sidebar h2, .sidebar .subtitle { display: none; }
-  .nav-item { padding: 12px 5px !important; justify-content: center; margin-bottom: 8px; border-radius: 10px; }
-  .nav-item .icon { margin-right: 0 !important; font-size: 1.3rem !important; }
-  .nav-item span:not(.icon) { display: none; }
-  .main-content { margin-left: 60px !important; padding: 12px !important; max-width: calc(100vw - 60px) !important; }
-  .card { padding: 14px !important; border-radius: 12px !important; margin-bottom: 12px !important; }
-  .card h3 { font-size: 1.05rem !important; }
-  .reading-content { font-size: 17px !important; line-height: 2.2 !important; }
-  .btn { padding: 10px 16px !important; font-size: 0.9rem !important; }
-  .streak-circle { width: 90px !important; height: 90px !important; }
-  .sutra-item { padding: 12px 0 !important; }
-  .sutra-item .sutra-name { font-size: 0.9rem !important; }
-}
+/* 桌面端微调 */
 @media (min-width: 769px) {
-  .sidebar { width: 220px; }
-  .main-content { margin-left: 220px; }
+  .top-bar { padding: 16px 40px 12px; }
+  .top-bar h2 { font-size: 1.15rem; }
+  .bottom-nav { max-width: 500px; margin: 0 auto; left: 50%; transform: translateX(-50%); border-left: 1px solid var(--border); border-right: 1px solid var(--border); border-radius: 16px 16px 0 0; }
+  body { padding-bottom: 90px; }
 }
 </style>
 </head>
 <body>
 
-<div class="app-container">
-  <nav class="sidebar">
-    <h2>🙏 诵佛功课</h2>
-    <p class="subtitle">弟子王琪</p>
-    <div class="nav-item active" data-page="home"><span class="icon">🏠</span><span>首页</span></div>
-    <div class="nav-item" data-page="ritual"><span class="icon">🕊️</span><span>前置仪轨</span></div>
-    <div class="nav-item" data-page="sutra"><span class="icon">📖</span><span>地藏经</span></div>
-    <div class="nav-item" data-page="dedication"><span class="icon">🙏</span><span>回向</span></div>
-    <div class="nav-item" data-page="backup"><span class="icon">💾</span><span>备份</span></div>
-  </nav>
-
-  <main class="main-content">
-    <!-- 首页 -->
-    <div class="page active" id="page-home">
-      <div class="card">
-        <h3>📊 修行概览</h3>
-        <div class="streak-container">
-          <div class="streak-circle">
-            <span class="number" id="streakDays">0</span>
-            <span class="label">连续天数</span>
-          </div>
-          <div>
-            <p style="font-size:0.9rem;color:var(--text-secondary);margin-bottom:8px;">今日状态：<span id="todayStatus" style="color:var(--red);font-weight:600;">未诵</span></p>
-            <p style="font-size:0.85rem;color:var(--text-secondary);">累计诵经 <strong id="totalCount" style="color:var(--primary);">0</strong> 部</p>
-            <button class="btn btn-primary" id="checkInBtn" style="margin-top:10px;padding:8px 18px;font-size:0.85rem;">今日打卡 ✓</button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- 前置仪轨 -->
-    <div class="page" id="page-ritual">
-      <div class="card">
-        <h3>🕊️ 前置仪轨</h3>
-        <div class="reading-content">
-          <div class="step">
-            <span class="step-num">【1】</span>
-            <span>净手漱口，上香一支（没有就合掌）</span>
-          </div>
-          <div class="step">
-            <span class="step-num">【2】</span>
-            <span>礼拜三拜（或合掌鞠躬三下）</span>
-          </div>
-          <div class="step">
-            <span class="step-num">【3】</span>
-            <span>念诵佛号：</span>
-            <p class="verse">南无本师释迦牟尼佛<span class="pinyin">（ná mó běn shī shì jiā móu ní fó）</span>　（三称）</p>
-            <p class="verse">南无大愿地藏王菩萨<span class="pinyin">（ná mó dà yuàn dì zàng wáng pú sà）</span>　（三称）</p>
-          </div>
-          <div class="step">
-            <span class="step-num">【4】</span>
-            <span>念诵净口业真言：</span>
-            <span class="sub-label">净口业真言（三遍）</span>
-            <p class="verse">唵 修利修利 摩诃修利 修修利 萨婆诃<span class="pinyin"><br>（ōng, xiū lì xiū lì, mó hē xiū lì, xiū xiū lì, sà pó hē.）</span></p>
-          </div>
-          <div class="step">
-            <span class="step-num">【5】</span>
-            <span>开经偈：</span>
-            <p class="verse">无上甚深微妙法，百千万劫难遭遇。<br>我今见闻得受持，愿解如来真实义。</p>
-          </div>
-        </div>
-        <button class="btn btn-primary" id="ritualDone" style="margin-top:16px;">标记完成 ✓</button>
-      </div>
-    </div>
-
-    <!-- 地藏经目录 -->
-    <div class="page" id="page-sutra">
-      <div class="card">
-        <h3>📖 地藏菩萨本愿经</h3>
-        <p style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:12px;">实叉难陀译 · 共13品 · 点品名进入阅读</p>
-        <ul class="sutra-list" id="sutraList"></ul>
-      </div>
-    </div>
-
-    <!-- 经文阅读页 -->
-    <div class="reading-page" id="readingPage">
-      <div class="card">
-        <button class="btn btn-outline" id="backToList" style="margin-bottom:16px;padding:8px 16px;font-size:0.85rem;">← 返回目录</button>
-        <h3 id="readingTitle" style="text-align:center;margin-bottom:16px;"></h3>
-        <div class="reading-content" id="readingText"></div>
-        <button class="btn btn-primary" id="markReadBtn" style="margin-top:20px;width:100%;">标记已读 ✓</button>
-      </div>
-    </div>
-
-    <!-- 回向 -->
-    <div class="page" id="page-dedication">
-      <div class="card">
-        <h3>🙏 补阙真言</h3>
-        <div class="reading-content">
-          <span class="sub-label">补阙真言（三遍）</span>
-          <p class="verse">南谟喝啰怛那 哆啰夜耶<span class="pinyin">（ná mó hē là dá nà, duō là yè yē）</span><br>
-          佉啰佉啰 俱住俱住 摩啰摩啰<span class="pinyin">（qié là qié là, jù zhù jù zhù, mó là mó là）</span><br>
-          虎啰 吽 贺贺 苏怛拏 吽 泼抹拏 娑婆诃<span class="pinyin"><br>（hǔ là hōng, hè hè, sū dá ná hōng, pō mǒ ná, suō pó hē）</span></p>
-        </div>
-      </div>
-      <div class="card">
-        <h3>🙏 大回向</h3>
-        <div class="merit-text" id="greatDedication"></div>
-        <button class="btn btn-primary" id="copyDedication" style="margin-top:8px;">复制回向文</button>
-      </div>
-      <div class="card">
-        <h3>🎯 专项回向</h3>
-        <div class="merit-text" id="specialDedication"></div>
-      </div>
-    </div>
-
-    <!-- 备份 -->
-    <div class="page" id="page-backup">
-      <div class="card">
-        <h3>💾 数据备份</h3>
-        <p style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:12px;">数据存储在浏览器本地，请定期导出备份以防丢失。</p>
-        <div class="backup-area">
-          <button class="btn btn-primary" id="exportBtn">导出 JSON</button>
-          <button class="btn btn-outline" id="importBtn">导入 JSON</button>
-          <input type="file" id="importFile" accept=".json">
-        </div>
-      </div>
-    </div>
-  </main>
+<!-- 顶部标题 -->
+<div class="top-bar">
+  <h2>🙏 诵佛功课</h2>
+  <div class="subtitle">弟子王琪</div>
 </div>
+
+<!-- 主内容 -->
+<main class="main-content">
+  <!-- 首页 -->
+  <div class="page active" id="page-home">
+    <div class="card">
+      <h3>📊 修行概览</h3>
+      <div class="streak-container">
+        <div class="streak-circle">
+          <span class="number" id="streakDays">0</span>
+          <span class="label">连续天数</span>
+        </div>
+        <div>
+          <p style="font-size:0.9rem;color:var(--text-secondary);margin-bottom:8px;">今日状态：<span id="todayStatus" style="color:var(--red);font-weight:600;">未诵</span></p>
+          <p style="font-size:0.85rem;color:var(--text-secondary);">累计诵经 <strong id="totalCount" style="color:var(--primary);">0</strong> 部</p>
+          <button class="btn btn-primary" id="checkInBtn" style="margin-top:10px;padding:8px 18px;font-size:0.85rem;">今日打卡 ✓</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 前置仪轨 -->
+  <div class="page" id="page-ritual">
+    <div class="card">
+      <h3>🕊️ 前置仪轨</h3>
+      <div class="reading-content">
+        <div class="step">
+          <span class="step-num">【1】</span>
+          <span>净手漱口，上香一支（没有就合掌）</span>
+        </div>
+        <div class="step">
+          <span class="step-num">【2】</span>
+          <span>礼拜三拜（或合掌鞠躬三下）</span>
+        </div>
+        <div class="step">
+          <span class="step-num">【3】</span>
+          <span>念诵佛号：</span>
+          <p class="verse">南无本师释迦牟尼佛<span class="pinyin">（ná mó běn shī shì jiā móu ní fó）</span>　（三称）</p>
+          <p class="verse">南无大愿地藏王菩萨<span class="pinyin">（ná mó dà yuàn dì zàng wáng pú sà）</span>　（三称）</p>
+        </div>
+        <div class="step">
+          <span class="step-num">【4】</span>
+          <span>念诵净口业真言：</span>
+          <span class="sub-label">净口业真言（三遍）</span>
+          <p class="verse">唵 修利修利 摩诃修利 修修利 萨婆诃<span class="pinyin"><br>（ōng, xiū lì xiū lì, mó hē xiū lì, xiū xiū lì, sà pó hē.）</span></p>
+        </div>
+        <div class="step">
+          <span class="step-num">【5】</span>
+          <span>开经偈：</span>
+          <p class="verse">无上甚深微妙法，百千万劫难遭遇。<br>我今见闻得受持，愿解如来真实义。</p>
+        </div>
+      </div>
+      <button class="btn btn-primary" id="ritualDone" style="margin-top:16px;">标记完成 ✓</button>
+    </div>
+  </div>
+
+  <!-- 地藏经目录 -->
+  <div class="page" id="page-sutra">
+    <div class="card">
+      <h3>📖 地藏菩萨本愿经</h3>
+      <p style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:12px;">实叉难陀译 · 共13品 · 点品名进入阅读</p>
+      <ul class="sutra-list" id="sutraList"></ul>
+    </div>
+  </div>
+
+  <!-- 经文阅读页 -->
+  <div class="reading-page" id="readingPage">
+    <div class="card">
+      <button class="btn btn-outline" id="backToList" style="margin-bottom:16px;padding:8px 16px;font-size:0.85rem;">← 返回目录</button>
+      <h3 id="readingTitle" style="text-align:center;margin-bottom:16px;"></h3>
+      <div class="reading-content" id="readingText"></div>
+      <button class="btn btn-primary" id="markReadBtn" style="margin-top:20px;width:100%;">标记已读 ✓</button>
+    </div>
+  </div>
+
+  <!-- 回向 -->
+  <div class="page" id="page-dedication">
+    <div class="card">
+      <h3>🙏 补阙真言</h3>
+      <div class="reading-content">
+        <span class="sub-label">补阙真言（三遍）</span>
+        <p class="verse">南谟喝啰怛那 哆啰夜耶<span class="pinyin">（ná mó hē là dá nà, duō là yè yē）</span><br>
+        佉啰佉啰 俱住俱住 摩啰摩啰<span class="pinyin">（qié là qié là, jù zhù jù zhù, mó là mó là）</span><br>
+        虎啰 吽 贺贺 苏怛拏 吽 泼抹拏 娑婆诃<span class="pinyin"><br>（hǔ là hōng, hè hè, sū dá ná hōng, pō mǒ ná, suō pó hē）</span></p>
+      </div>
+    </div>
+    <div class="card">
+      <h3>🙏 大回向</h3>
+      <div class="merit-text" id="greatDedication"></div>
+      <button class="btn btn-primary" id="copyDedication" style="margin-top:8px;">复制回向文</button>
+    </div>
+    <div class="card">
+      <h3>🎯 专项回向</h3>
+      <div class="merit-text" id="specialDedication"></div>
+    </div>
+  </div>
+
+  <!-- 备份 -->
+  <div class="page" id="page-backup">
+    <div class="card">
+      <h3>💾 数据备份</h3>
+      <p style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:12px;">数据存储在浏览器本地，请定期导出备份以防丢失。</p>
+      <div class="backup-area">
+        <button class="btn btn-primary" id="exportBtn">导出 JSON</button>
+        <button class="btn btn-outline" id="importBtn">导入 JSON</button>
+        <input type="file" id="importFile" accept=".json">
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- 底部导航 -->
+<nav class="bottom-nav">
+  <div class="nav-item active" data-page="home"><span class="icon">🏠</span><span>首页</span></div>
+  <div class="nav-item" data-page="ritual"><span class="icon">🕊️</span><span>仪轨</span></div>
+  <div class="nav-item" data-page="sutra"><span class="icon">📖</span><span>地藏经</span></div>
+  <div class="nav-item" data-page="dedication"><span class="icon">🙏</span><span>回向</span></div>
+  <div class="nav-item" data-page="backup"><span class="icon">💾</span><span>备份</span></div>
+</nav>
 
 <div class="toast" id="toast"></div>
 
@@ -342,6 +345,7 @@ document.querySelectorAll('.nav-item').forEach(item => {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     document.getElementById(`page-${page}`).classList.add('active');
     document.getElementById('readingPage').classList.remove('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   });
 });
 
@@ -426,11 +430,13 @@ function openReading(chapterId) {
   document.getElementById('readingPage').classList.add('active');
   document.getElementById('readingTitle').textContent = `第${chapterId}品 · ${chapterNames[chapterId-1]}`;
   document.getElementById('readingText').innerHTML = (window.SUTRA_TEXTS && window.SUTRA_TEXTS[chapterId]) ? window.SUTRA_TEXTS[chapterId] : '<p>经文加载中...</p>';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 document.getElementById('backToList').addEventListener('click', () => {
   document.getElementById('readingPage').classList.remove('active');
   document.getElementById('page-sutra').classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 });
 
 document.getElementById('markReadBtn').addEventListener('click', () => {
